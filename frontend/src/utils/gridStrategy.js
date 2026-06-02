@@ -84,7 +84,7 @@ export function executeStrategy(params, historyList) {
     const summary = createSummary(params, balance, ethBalance, historyList, totalProfit, totalTrades, minBalance, pendingSells, maxPrice, filledLevels);
     const chartData = createChartData(trades);
 
-    return { trades, summary, chartData };
+    return { trades, summary, chart_data: chartData };
 }
 
 function executeBuyOrder(params, price, timestamp, orderCounter, balance, ethBalance) {

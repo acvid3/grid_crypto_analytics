@@ -28,8 +28,6 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npx vite build --base=/grid_crypto_analytics/
-        env:
-          VITE_API_URL: http://13.50.4.32:8000/api
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
