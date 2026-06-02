@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiUrl } from '../../apiBase';
+import { fetchAvailableSymbols } from '../../utils/binanceData';
 import styles from './style.module.css';
 
 const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
@@ -14,14 +15,25 @@ const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
     const fetchSymbols = async () => {
         try {
             const url = apiUrl('symbols');
-            console.log('Fetching symbols from:', url);
-                
             const response = await fetch(url);
             const data = await response.json();
             setSymbols(data.symbols || []);
             
             if (data.symbols && data.symbols.length > 0 && !selectedSymbol) {
                 onSymbolChange(data.symbols[0].symbol);
+            }
+            return;
+        } catch (error) {
+            console.log('Backend unavailable, fetching symbols directly from Binance');
+        }
+
+        try {
+            const data = await fetchAvailableSymbols();
+            if (data && data.length > 0) {
+                setSymbols(data);
+                if (!selectedSymbol) {
+                    onSymbolChange(data[0].symbol);
+                }
             }
         } catch (error) {
             console.error('Error fetching symbols:', error);

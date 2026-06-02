@@ -3,6 +3,8 @@ import InvestmentForm from './components/InvestmentForm';
 import AnalysisResults from './components/AnalysisResults';
 import CurrencySelector from './components/CurrencySelector';
 import { apiUrl } from './apiBase';
+import { fetchHistoricalData } from './utils/binanceData';
+import { executeStrategy } from './utils/gridStrategy';
 import './index.css';
 
 function App() {
@@ -14,11 +16,9 @@ function App() {
     const handleAnalysis = async (formData) => {
         setLoading(true);
         setError(null);
-        
+
         try {
             const url = apiUrl('analyze');
-            console.log('Sending analysis request to:', url);
-                
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -28,11 +28,33 @@ function App() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP ${response.status}`);
             }
 
             const data = await response.json();
             setAnalysisData(data);
+            return;
+        } catch (err) {
+            console.log('Backend unavailable, running local analysis');
+        }
+
+        try {
+            const endTime = new Date(formData.end_date).getTime();
+            const startTime = new Date(formData.start_date).getTime();
+
+            const historyList = await fetchHistoricalData(
+                formData.symbol,
+                formData.interval,
+                startTime,
+                endTime
+            );
+
+            if (!historyList || historyList.length === 0) {
+                throw new Error('No historical data available');
+            }
+
+            const result = executeStrategy(formData, historyList);
+            setAnalysisData(result);
         } catch (err) {
             setError(err.message);
             console.error('Analysis error:', err);
