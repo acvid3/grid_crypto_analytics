@@ -22,6 +22,7 @@ const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
             if (data.symbols && data.symbols.length > 0 && !selectedSymbol) {
                 onSymbolChange(data.symbols[0].symbol);
             }
+            setLoading(false);
             return;
         } catch (error) {
             console.log('Backend unavailable, fetching symbols directly from Binance');

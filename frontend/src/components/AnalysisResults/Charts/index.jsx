@@ -3,6 +3,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import styles from './style.module.css';
 
 function Charts({ chart_data }) {
+    if (!chart_data || !chart_data.dates) {
+        return null;
+    }
+
     return (
         <div className={styles.chartsSection}>
             <h3>Charts</h3>
