@@ -5,9 +5,9 @@ import os
 from app.api.investment_routes import root_router, api_router
 
 app = FastAPI(
-    title="Investment Analysis API", 
+    title="Grid Crypto Analytics API", 
     version="1.0.0",
-    description="API for investment strategy analysis using Binance data"
+    description="API for grid trading strategy backtesting using Binance historical data"
 )
 
 app.add_middleware(

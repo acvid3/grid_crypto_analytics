@@ -40,40 +40,48 @@ class InvestmentAnalysisService:
         pending_sells = []
         order_counter = 1
         trades = []
-        last_buy_price = None
-        
-        current_price = float(history_list[0]["close"])
-        last_buy_price = current_price
+
+        max_price = float(history_list[0]["close"])
+        filled_levels = set()
         min_balance = balance
         total_profit = 0
         total_trades = 0
-        
+
         for row in history_list:
             price = float(row["close"])
             timestamp = row["timestamp"]
+
+            if price > max_price:
+                max_price = price
 
             if balance < min_balance:
                 min_balance = balance
 
             if balance >= params.trade_amount:
-                if price <= last_buy_price * (1 - params.threshold_percent):
-                    trade_record = self._execute_buy_order(
-                        params, price, timestamp, order_counter, balance, eth_balance
-                    )
-                    trades.append(trade_record)
-                    
-                    sell_task = self._create_sell_task(
-                        order_counter, price, params.threshold_percent, 
-                        trade_record.eth_amount, params.trade_amount, timestamp
-                    )
-                    pending_sells.append(sell_task)
-                    
-                    commission = params.trade_amount * params.commission_rate
-                    eth_amount = (params.trade_amount - commission) / price
-                    balance -= params.trade_amount
-                    eth_balance += eth_amount
-                    last_buy_price = price
-                    order_counter += 1
+                level = int((max_price - price) / (max_price * params.threshold_percent))
+                max_levels = int(100 / params.threshold_percent)
+
+                if 0 < level < max_levels and level not in filled_levels:
+                    level_price = max_price * (1 - level * params.threshold_percent)
+
+                    if price <= level_price:
+                        trade_record = self._execute_buy_order(
+                            params, price, timestamp, order_counter, balance, eth_balance
+                        )
+                        trades.append(trade_record)
+
+                        sell_task = self._create_sell_task(
+                            order_counter, price, params.threshold_percent,
+                            trade_record.eth_amount, params.trade_amount, timestamp
+                        )
+                        pending_sells.append(sell_task)
+
+                        commission = params.trade_amount * params.commission_rate
+                        eth_amount = (params.trade_amount - commission) / price
+                        balance -= params.trade_amount
+                        eth_balance += eth_amount
+                        filled_levels.add(level)
+                        order_counter += 1
 
             if pending_sells:
                 for task in list(pending_sells):
@@ -82,33 +90,33 @@ class InvestmentAnalysisService:
 
                     if price >= target_price:
                         trade_record = self._execute_sell_order(
-                            params, price, timestamp, order_counter, task, 
+                            params, price, timestamp, order_counter, task,
                             balance, eth_balance
                         )
                         trades.append(trade_record)
-                        
+
                         eth_to_sell = task["eth_amount"]
                         gross_usdt = eth_to_sell * price
                         commission = gross_usdt * params.commission_rate
                         net_usdt = gross_usdt - commission
-                        
+
                         invested = task["cost_usdt"]
                         profit = net_usdt - invested
                         total_profit += profit
                         total_trades += 1
-                        
+
                         balance += net_usdt
                         eth_balance -= eth_to_sell
-                        last_buy_price = price
                         order_counter += 1
                         pending_sells.remove(task)
 
-            if not pending_sells and price > last_buy_price:
-                last_buy_price = price
-        
+            if not pending_sells:
+                max_price = max(max_price, price)
+                filled_levels.clear()
+
         summary = self._create_summary(params, balance, eth_balance, history_list, total_profit, total_trades, min_balance, pending_sells)
         chart_data = self._create_chart_data(trades)
-        
+
         return trades, summary, chart_data
     
     def _execute_buy_order(self, params: InvestmentParams, price: float, timestamp: int, 

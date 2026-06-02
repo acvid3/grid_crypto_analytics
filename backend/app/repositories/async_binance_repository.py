@@ -87,21 +87,18 @@ class AsyncBinanceRepository:
         return sorted(all_data, key=lambda x: x["timestamp"])
     
     async def get_symbol_24h_data(self, symbol: str) -> Dict[str, Any]:
-        """Get 24h data for a specific symbol using the same API as analyze"""
         try:
             if not self.session:
                 self.session = aiohttp.ClientSession()
             
             end_time = int(datetime.now().timestamp() * 1000)
-            start_time = end_time - (24 * 60 * 60 * 1000)  # 24 hours ago
+            start_time = end_time - (24 * 60 * 60 * 1000)
             
-            # Get 1-hour candles for the last 24 hours
             data = await self.get_historical_price_data_parallel(start_time, end_time, symbol, "1h")
             
             if not data:
                 return None
             
-            # Calculate 24h statistics
             first_price = data[0]["open"]
             last_price = data[-1]["close"]
             high_price = max(candle["high"] for candle in data)
@@ -129,12 +126,10 @@ class AsyncBinanceRepository:
             return None
     
     async def get_available_symbols(self) -> List[Dict[str, Any]]:
-        """Get all available USDT pairs with 24h data"""
         try:
             if not self.session:
                 self.session = aiohttp.ClientSession()
             
-            # First get all available symbols
             async with self.session.get(f"{self.base_url}/exchangeInfo") as response:
                 if response.status != 200:
                     return []
@@ -147,16 +142,13 @@ class AsyncBinanceRepository:
             
             print(f"Found {len(usdt_symbols)} USDT trading pairs")
             
-            # Get 24h data for all symbols in parallel
             tasks = []
             for symbol in usdt_symbols:
                 task = self.get_symbol_24h_data(symbol)
                 tasks.append(task)
             
-            # Execute all tasks with semaphore to limit concurrent requests
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
-            # Filter out errors and None results
             valid_results = []
             for result in results:
                 if isinstance(result, dict) and result is not None:

@@ -8,7 +8,7 @@ function InvestmentForm({ onSubmit, loading, selectedSymbol }) {
         initial_balance: 10000,
         trade_amount: 1000,
         threshold_percent: 5,
-        commission_rate: 0.075,
+        commission_rate: 0.1,
         start_date: format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd\'T\'HH:mm'),
         end_date: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'),
         symbol: 'ETHUSDT',
@@ -185,7 +185,7 @@ function InvestmentForm({ onSubmit, loading, selectedSymbol }) {
                         className={styles.submitButton}
                         disabled={loading}
                     >
-                        {loading ? 'Analyzing...' : 'Analyze Investment Strategy'}
+                        {loading ? 'Analyzing...' : 'Run Analysis'}
                     </button>
                 </div>
             </form>

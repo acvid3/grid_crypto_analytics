@@ -16,7 +16,7 @@ def get_investment_service():
 @root_router.get("/")
 async def root():
     return {
-        "message": "Investment Analysis API", 
+        "message": "Grid Crypto Analytics API", 
         "version": "1.0.0",
         "deployment": "AWS"
     }

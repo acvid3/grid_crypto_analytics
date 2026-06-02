@@ -54,8 +54,8 @@ function App() {
             
             <div className="app-content">
                 <header className="app-header">
-                    <h1>Investment Strategy Analysis</h1>
-                    <p>Analyze investment returns with commissions and trading steps</p>
+                    <h1>Grid Crypto Analytics</h1>
+                    <p>Historical grid trading simulation and analysis</p>
                 </header>
                 
                 <main className="app-main">

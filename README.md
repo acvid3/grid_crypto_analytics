@@ -1,168 +1,60 @@
-# Investment Strategy Analysis
+# Grid Crypto Analytics
 
-A comprehensive investment analysis tool that analyzes trading strategies with commissions and trading steps using Binance API data.
+Grid trading strategy backtester using historical Binance data.
 
-## 🏗️ Architecture
+## How it works
 
-The project is split into two independent services:
+Simulates buying crypto when the price drops by a set threshold from the peak price, and selling when it rises by the same threshold.
 
-- **Backend**: FastAPI application deployed on AWS
-- **Frontend**: React + Vite application deployed on Vercel
+### Buy Logic
 
-## 🚀 Quick Start
+- Tracks `max_price` — highest price since the last completed cycle
+- Buy triggers when price drops by `threshold_percent` from `max_price`:
+  ```
+  level = int((max_price - price) / (max_price * threshold))
+  ```
+- Each level is bought only once
+- At `threshold = 5%`, max 19 purchases (levels 5%–95% from peak)
+- Grid resets when all positions are closed — `max_price` updates to current price
 
-### Prerequisites
+### Sell Logic
 
-- Python 3.11+
-- Node.js 18+
-- npm
+- Each buy creates a sell order at `buy_price * (1 + threshold)`
+- On trigger — profit is realized
 
-### Local Development
+## Tech Stack
 
-1. **Start Backend:**
-   ```bash
-   cd backend
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   python main.py
-   ```
-   Backend will be available at: http://localhost:8000
+- **Backend**: Python, FastAPI, aiohttp (async Binance API requests)
+- **Frontend**: React, Vite, Recharts
 
-2. **Start Frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-   Frontend will be available at: http://localhost:3000
-
-## 📁 Project Structure
-
-```
-fastapi_binance_calculations/
-├── backend/                 # FastAPI backend
-│   ├── main.py             # Main application
-│   ├── requirements.txt    # Python dependencies
-│   ├── Dockerfile         # Docker configuration
-│   └── docker-compose.yml # Docker Compose
-├── frontend/               # React + Vite frontend
-│   ├── src/               # Source code
-│   ├── package.json       # Node.js dependencies
-│   ├── vite.config.js     # Vite configuration
-│   └── vercel.json        # Vercel deployment
-├── DEPLOYMENT.md           # Deployment guide
-└── README.md              # This file
-```
-
-## 🛠️ Technologies
+## Running
 
 ### Backend
-- **FastAPI** - Modern Python web framework
-- **Pydantic** - Data validation
-- **Requests** - HTTP library
-- **Uvicorn** - ASGI server
-
-### Frontend
-- **React 18** - UI library
-- **Vite** - Build tool
-- **Recharts** - Chart components
-- **date-fns** - Date utilities
-
-### Infrastructure
-- **AWS** - Backend hosting (EC2, ECS, Lambda)
-- **Vercel** - Frontend hosting
-- **Docker** - Containerization
-
-## 📊 API Endpoints
-
-### Core Endpoints
-
-- `GET /` - API information
-- `GET /health` - Health check
-- `POST /analyze` - Investment analysis
-- `GET /symbols` - Available trading pairs
-
-### Analysis Parameters
-
-```json
-{
-  "initial_balance": 10000,
-  "trade_amount": 1000,
-  "threshold_percent": 0.05,
-  "commission_rate": 0.00075,
-  "start_date": "2024-01-01T00:00:00",
-  "end_date": "2024-02-01T00:00:00",
-  "symbol": "ETHUSDT",
-  "interval": "1h"
-}
-```
-
-## 📈 Trading Algorithm
-
-The system implements a DCA (Dollar Cost Averaging) strategy:
-
-1. **Buy Signal**: When price drops by threshold percentage
-2. **Sell Signal**: When price rises by threshold percentage
-3. **Commission Calculation**: Applied to all trades
-4. **Position Tracking**: Monitors open and closed positions
-
-## 🚀 Deployment
-
-### Backend (AWS)
-
-- **EC2**: Simple deployment
-- **ECS**: Container orchestration
-- **Lambda**: Serverless functions
-
-### Frontend (Vercel)
-
-- Automatic deployments from Git
-- Global CDN
-- Zero configuration
-
-## 🔒 Security
-
-- CORS configuration for production domains
-- Input validation with Pydantic
-- Rate limiting for API calls
-- Secure headers configuration
-
-## 📊 Monitoring
-
-- Health check endpoints
-- Error logging
-- Performance metrics
-- AWS CloudWatch integration
-
-## 🛠️ Development Commands
 
 ```bash
-# Backend
 cd backend
-python main.py
-
-# Frontend
-cd frontend
-npm run dev
-npm run build
-
-# Docker
-docker-compose up --build
+source venv/bin/activate
+python run.py
 ```
 
-## 📝 License
+Server at http://localhost:8000, Swagger at http://localhost:8000/docs
 
-This project is for educational purposes. Use at your own risk.
+### Frontend
 
-## 🤝 Contributing
+```bash
+cd frontend
+npm run dev
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+At http://localhost:3000
 
----
+## Parameters
 
-**Note**: This tool is for educational purposes only. Always do your own research before making investment decisions.
-# fastapi_binance_calculations
+| Parameter | Description | Default |
+|---|---|---|
+| Initial Balance | Starting capital in USDT | 10000 |
+| Trade Amount | Amount per trade | 1000 |
+| Price Change Threshold | Price change trigger | 5% |
+| Commission Rate | Exchange fee | 0.1% |
+| Trading Pair | Trading pair | ETHUSDT |
+| Time Interval | Candle timeframe | 1h |

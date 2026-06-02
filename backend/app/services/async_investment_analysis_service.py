@@ -47,10 +47,9 @@ class AsyncInvestmentAnalysisService:
         pending_sells = []
         order_counter = 1
         trades = []
-        last_buy_price = None
         
-        current_price = float(history_list[0]["close"])
-        last_buy_price = current_price
+        max_price = float(history_list[0]["close"])
+        filled_levels = set()
         min_balance = balance
         total_profit = 0
         total_trades = 0
@@ -59,7 +58,7 @@ class AsyncInvestmentAnalysisService:
         print(f"  Initial balance: ${balance}")
         print(f"  Trade amount: ${params.trade_amount}")
         print(f"  Threshold: {params.threshold_percent * 100}%")
-        print(f"  First price: ${current_price}")
+        print(f"  Max price: ${max_price}")
         print(f"  First timestamp: {datetime.fromtimestamp(history_list[0]['timestamp'] / 1000)}")
         
         day_counter = 0
@@ -73,20 +72,29 @@ class AsyncInvestmentAnalysisService:
             if current_day != current_date.date():
                 current_day = current_date.date()
                 day_counter += 1
-                if day_counter % 5 == 0:  # Log every 5 days
+                if day_counter % 5 == 0:
                     print(f"  Day {day_counter}: {current_date.strftime('%Y-%m-%d')} - Price: ${price:.2f}, Balance: ${balance:.2f}, ETH: {eth_balance:.6f}")
 
+            if price > max_price:
+                max_price = price
+                print(f"  New max price: ${max_price:.2f} at {current_date.strftime('%Y-%m-%d %H:%M')}")
+            
             if balance < min_balance:
                 min_balance = balance
 
             if balance >= params.trade_amount:
-                threshold_price = last_buy_price * (1 - params.threshold_percent)
-                if price <= threshold_price:
-                    print(f"  BUY SIGNAL at {current_date.strftime('%Y-%m-%d %H:%M')}:")
-                    print(f"    Current price: ${price:.2f}")
-                    print(f"    Threshold price: ${threshold_price:.2f}")
-                    print(f"    Last buy price: ${last_buy_price:.2f}")
-                    print(f"    Price drop: {((last_buy_price - price) / last_buy_price * 100):.2f}%")
+                level = int((max_price - price) / (max_price * params.threshold_percent))
+                max_levels = int(100 / params.threshold_percent)
+                
+                if 0 < level < max_levels and level not in filled_levels:
+                    level_price = max_price * (1 - level * params.threshold_percent)
+                    
+                    if price <= level_price:
+                        print(f"  BUY SIGNAL at {current_date.strftime('%Y-%m-%d %H:%M')}:")
+                        print(f"    Current price: ${price:.2f}")
+                        print(f"    Level {level}: ${level_price:.2f} ({(level * params.threshold_percent * 100):.0f}% drop)")
+                        print(f"    Max price: ${max_price:.2f}")
+                        print(f"    Price drop: {((max_price - price) / max_price * 100):.2f}%")
                     
                     trade_record = self._execute_buy_order(
                         params, price, timestamp, order_counter, balance, eth_balance
@@ -103,14 +111,18 @@ class AsyncInvestmentAnalysisService:
                     eth_amount = (params.trade_amount - commission) / price
                     balance -= params.trade_amount
                     eth_balance += eth_amount
-                    last_buy_price = price
+                    filled_levels.add(level)
                     order_counter += 1
                     
                     print(f"    BUY executed: {eth_amount:.6f} ETH for ${params.trade_amount}")
                     print(f"    New balance: ${balance:.2f}, ETH: {eth_balance:.6f}")
                 else:
-                    if i % 1000 == 0:  # Log every 1000th check to avoid spam
-                        print(f"    Price check at {current_date.strftime('%Y-%m-%d %H:%M')}: ${price:.2f} > ${threshold_price:.2f} (no buy)")
+                    if i % 1000 == 0:
+                        current_level = int((max_price - price) / (max_price * params.threshold_percent))
+                        if 0 < current_level < max_levels:
+                            level_price = max_price * (1 - current_level * params.threshold_percent)
+                            status = "filled" if current_level in filled_levels else "available"
+                            print(f"    Price check at {current_date.strftime('%Y-%m-%d %H:%M')}: ${price:.2f} > ${level_price:.2f} (level {current_level} {status})")
 
             if pending_sells:
                 for task in list(pending_sells):
@@ -142,7 +154,6 @@ class AsyncInvestmentAnalysisService:
                         
                         balance += net_usdt
                         eth_balance -= eth_to_sell
-                        last_buy_price = price
                         order_counter += 1
                         pending_sells.remove(task)
                         
@@ -150,8 +161,9 @@ class AsyncInvestmentAnalysisService:
                         print(f"    Profit: ${profit:.2f}")
                         print(f"    New balance: ${balance:.2f}, ETH: {eth_balance:.6f}")
 
-            if not pending_sells and price > last_buy_price:
-                last_buy_price = price
+            if not pending_sells:
+                max_price = max(max_price, price)
+                filled_levels.clear()
         
         print(f"\nStrategy execution completed:")
         print(f"  Total trades: {len(trades)}")
@@ -159,8 +171,10 @@ class AsyncInvestmentAnalysisService:
         print(f"  Pending positions: {len(pending_sells)}")
         print(f"  Final balance: ${balance:.2f}")
         print(f"  Final ETH: {eth_balance:.6f}")
+        print(f"  Max price reached: ${max_price:.2f}")
+        print(f"  Filled levels: {sorted(filled_levels)}")
         
-        summary = self._create_summary(params, balance, eth_balance, history_list, total_profit, total_trades, min_balance, pending_sells)
+        summary = self._create_summary(params, balance, eth_balance, history_list, total_profit, total_trades, min_balance, pending_sells, max_price, filled_levels)
         chart_data = self._create_chart_data(trades)
         
         return trades, summary, chart_data
@@ -227,7 +241,8 @@ class AsyncInvestmentAnalysisService:
     
     def _create_summary(self, params: InvestmentParams, balance: float, eth_balance: float,
                        history_list: List[Dict[str, Any]], total_profit: float, 
-                       total_trades: int, min_balance: float, pending_sells: List[Dict[str, Any]]) -> Dict[str, Any]:
+                       total_trades: int, min_balance: float, pending_sells: List[Dict[str, Any]],
+                       max_price: float, filled_levels: set) -> Dict[str, Any]:
         final_balance = balance + (eth_balance * float(history_list[-1]["close"]))
         
         return {
@@ -237,7 +252,10 @@ class AsyncInvestmentAnalysisService:
             "total_trades": total_trades,
             "min_balance": min_balance,
             "roi_percent": (final_balance - params.initial_balance) / params.initial_balance * 100,
-            "pending_positions": len(pending_sells)
+            "pending_positions": len(pending_sells),
+            "max_price": max_price,
+            "filled_levels": sorted(list(filled_levels)),
+            "total_levels": int(100 / params.threshold_percent)
         }
     
     def _create_chart_data(self, trades: List[TradeRecord]) -> Dict[str, Any]:

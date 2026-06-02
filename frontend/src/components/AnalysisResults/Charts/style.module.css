@@ -13,7 +13,6 @@
     font-size: 18px;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .chartContainer {
         margin-bottom: 30px;

@@ -7,7 +7,7 @@ class InvestmentParams(BaseModel):
     initial_balance: float = 10000
     trade_amount: float = 1000
     threshold_percent: float = 0.05
-    commission_rate: float = 0.00075
+    commission_rate: float = 0.001
     start_date: str
     end_date: str
     symbol: str = "ETHUSDT"

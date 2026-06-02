@@ -41,7 +41,6 @@
     padding: 30px;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .tabContent {
         padding: 20px;
