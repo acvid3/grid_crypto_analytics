@@ -1,0 +1,24 @@
+.root {
+    display: block;
+    color: #f7931a;
+}
+
+.spinner {
+    transform-origin: 50px 40px;
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation: none;
+    }
+}

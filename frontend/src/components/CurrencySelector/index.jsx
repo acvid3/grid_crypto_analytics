@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiUrl } from '../../apiBase';
 import { fetchAvailableSymbols } from '../../utils/binanceData';
 import SearchIcon from '../icons/SearchIcon';
+import LoaderIcon from '../icons/LoaderIcon';
 import styles from './style.module.css';
 
 const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
@@ -74,7 +75,17 @@ const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
                 <div className={styles.header}>
                     <h3>Currency Pairs</h3>
                 </div>
-                <div className={styles.loading}>Loading...</div>
+                <div className={styles.loading}>
+                    <LoaderIcon size={56} />
+                    <span className={styles.loadingText}>Loading</span>
+                    <div className={styles.runner}>
+                        <span className={styles.runnerCell}></span>
+                        <span className={styles.runnerCell}></span>
+                        <span className={styles.runnerCell}></span>
+                        <span className={styles.runnerCell}></span>
+                        <span className={styles.runnerCell}></span>
+                    </div>
+                </div>
             </div>
         );
     }
