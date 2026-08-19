@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiUrl } from '../../apiBase';
 import { fetchAvailableSymbols } from '../../utils/binanceData';
+import SearchIcon from '../icons/SearchIcon';
 import styles from './style.module.css';
 
 const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
@@ -81,7 +82,10 @@ const CurrencySelector = ({ onSymbolChange, selectedSymbol }) => {
     return (
         <div className={styles.sidebar}>
             <div className={styles.header}>
-                <h3>Currency Pairs</h3>
+                <div className={styles.titleRow}>
+                    <SearchIcon size={22} />
+                    <h3>Currency Pairs</h3>
+                </div>
                 <input
                     type="text"
                     placeholder="Search..."

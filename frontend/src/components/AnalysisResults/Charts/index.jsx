@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import ChartIcon from '../../icons/ChartIcon';
 import styles from './style.module.css';
 
 function Charts({ chart_data }) {
@@ -9,7 +10,10 @@ function Charts({ chart_data }) {
 
     return (
         <div className={styles.chartsSection}>
-            <h3>Charts</h3>
+            <div className={styles.headerRow}>
+                <ChartIcon size={28} />
+                <h3>Charts</h3>
+            </div>
             
             <div className={styles.chartContainer}>
                 <h4>Price and Balance Dynamics</h4>

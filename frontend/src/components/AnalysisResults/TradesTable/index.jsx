@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './style.module.css';
 import MarketIndicator from '../../MarketIndicator';
 import MobileTradesList from '../MobileTradesList';
+import TradeIcon from '../../icons/TradeIcon';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import { formatCurrency, getMarketData } from '../../../utils/tradeUtils';
 
@@ -11,7 +12,10 @@ function TradesTable({ trades }) {
     if (isMobile) {
         return (
             <div className={styles.tradesSection}>
-                <h3>Trade History</h3>
+                <div className={styles.headerRow}>
+                    <TradeIcon size={28} />
+                    <h3>Trade History</h3>
+                </div>
                 <div className={styles.mobileContainer}>
                     <MobileTradesList trades={trades} />
                 </div>
@@ -21,7 +25,10 @@ function TradesTable({ trades }) {
 
     return (
         <div className={styles.tradesSection}>
-            <h3>Trade History</h3>
+            <div className={styles.headerRow}>
+                <TradeIcon size={28} />
+                <h3>Trade History</h3>
+            </div>
             <div className={styles.tableContainer}>
                 <table className={styles.tradesTable}>
                     <thead>

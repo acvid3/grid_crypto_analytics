@@ -1,7 +1,6 @@
 .indicator {
     background: #1e1e1e;
     border: 1px solid #333;
-    border-radius: 8px;
     padding: 16px;
     margin: 8px 0;
     transition: all 0.3s ease;
@@ -31,14 +30,15 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .change {
     font-size: 12px;
     font-weight: 500;
     padding: 2px 6px;
-    border-radius: 4px;
     white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .change.positive {
@@ -71,7 +71,6 @@
 
 .volumeStatus {
     padding: 4px 8px;
-    border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -110,7 +109,6 @@
 .progressBar {
     height: 6px;
     background: #333;
-    border-radius: 3px;
     overflow: hidden;
     margin-bottom: 4px;
 }
@@ -147,10 +145,12 @@
 .volumeValue {
     color: #ccc;
     font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .volumeChange {
     font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .volumeChange.positive {

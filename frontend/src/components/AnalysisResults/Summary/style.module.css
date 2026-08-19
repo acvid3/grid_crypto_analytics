@@ -1,6 +1,13 @@
 .summarySection h3 {
-    margin-bottom: 25px;
+    margin-bottom: 0;
     color: #e8e9ea;
+}
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
 }
 
 .summaryGrid {
@@ -11,11 +18,10 @@
 }
 
 .summaryCard {
-    background: rgba(17, 17, 17, 0.8);
+    background: rgba(18, 20, 26, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 20px;
-    border-radius: 8px;
     text-align: center;
     border: 1px solid rgba(51, 51, 51, 0.5);
 }
@@ -31,6 +37,7 @@
     font-size: 24px;
     font-weight: 600;
     color: #e8e9ea;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .positive {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { apiUrl } from '../../apiBase';
+import SlidersIcon from '../icons/SlidersIcon';
 import styles from './style.module.css';
 
 function InvestmentForm({ onSubmit, loading, selectedSymbol }) {
@@ -68,7 +69,10 @@ function InvestmentForm({ onSubmit, loading, selectedSymbol }) {
 
     return (
         <div className={styles.investmentForm}>
-            <h2>Analysis Parameters</h2>
+            <div className={styles.headerRow}>
+                <SlidersIcon size={28} />
+                <h2>Analysis Parameters</h2>
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGrid}>
                     <div className={styles.formGroup}>

@@ -1,0 +1,29 @@
+.root {
+    display: block;
+    color: #f7931a;
+}
+
+.dot {
+    animation: blink 1.4s steps(2, start) infinite;
+}
+
+.dot:nth-of-type(2) {
+    animation-delay: 0.7s;
+}
+
+@keyframes blink {
+    0%,
+    55% {
+        opacity: 1;
+    }
+    56%,
+    100% {
+        opacity: 0.2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dot {
+        animation: none;
+    }
+}

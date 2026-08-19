@@ -1,0 +1,56 @@
+.root {
+    display: block;
+    color: #f7931a;
+}
+
+.coin {
+    transform-origin: 30px 38px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.bar {
+    animation: flow 2s ease-in-out infinite;
+}
+
+.dot {
+    animation: blink 1.4s steps(2, start) infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+@keyframes flow {
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes blink {
+    0%,
+    55% {
+        opacity: 1;
+    }
+    56%,
+    100% {
+        opacity: 0.2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .coin,
+    .bar,
+    .dot {
+        animation: none;
+    }
+}

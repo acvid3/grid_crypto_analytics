@@ -17,8 +17,7 @@ def get_investment_service():
 async def root():
     return {
         "message": "Grid Crypto Analytics API", 
-        "version": "1.0.0",
-        "deployment": "AWS"
+        "version": "1.0.0"
     }
 
 

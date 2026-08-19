@@ -1,0 +1,30 @@
+.root {
+    display: block;
+    color: #f7931a;
+}
+
+.gearBig {
+    transform-origin: 38px 40px;
+    animation: spin 6s linear infinite;
+}
+
+.gearSmall {
+    transform-origin: 66px 26px;
+    animation: spin 4s linear infinite reverse;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gearBig,
+    .gearSmall {
+        animation: none;
+    }
+}

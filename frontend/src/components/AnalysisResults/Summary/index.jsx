@@ -1,4 +1,5 @@
 import React from 'react';
+import WalletIcon from '../../icons/WalletIcon';
 import styles from './style.module.css';
 
 function Summary({ summary }) {
@@ -17,7 +18,10 @@ function Summary({ summary }) {
 
     return (
         <div className={styles.summarySection}>
-            <h3>Results Summary</h3>
+            <div className={styles.headerRow}>
+                <WalletIcon size={28} />
+                <h3>Results Summary</h3>
+            </div>
             <div className={styles.summaryGrid}>
                 <div className={styles.summaryCard}>
                     <h4>Initial Balance</h4>

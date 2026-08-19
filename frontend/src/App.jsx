@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import InvestmentForm from './components/InvestmentForm';
 import AnalysisResults from './components/AnalysisResults';
 import CurrencySelector from './components/CurrencySelector';
+import Hero from './components/Hero';
+import HowItWorks from './components/HowItWorks';
 import { apiUrl } from './apiBase';
 import { fetchHistoricalData } from './utils/binanceData';
 import { executeStrategy } from './utils/gridStrategy';
@@ -18,27 +20,27 @@ function App() {
         setError(null);
 
         try {
-            const url = apiUrl('analyze');
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            try {
+                const url = apiUrl('analyze');
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                setAnalysisData(data);
+                return;
+            } catch (err) {
+                console.log('Backend unavailable, running local analysis');
             }
 
-            const data = await response.json();
-            setAnalysisData(data);
-            return;
-        } catch (err) {
-            console.log('Backend unavailable, running local analysis');
-        }
-
-        try {
             const endTime = new Date(formData.end_date).getTime();
             const startTime = new Date(formData.start_date).getTime();
 
@@ -75,10 +77,8 @@ function App() {
             />
             
             <div className="app-content">
-                <header className="app-header">
-                    <h1>Grid Crypto Analytics</h1>
-                    <p>Historical grid trading simulation and analysis</p>
-                </header>
+                <Hero />
+                <HowItWorks />
                 
                 <main className="app-main">
                     <InvestmentForm 

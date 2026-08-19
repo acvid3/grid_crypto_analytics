@@ -1,0 +1,40 @@
+.root {
+    display: block;
+    color: #f7931a;
+}
+
+.bar {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.dot {
+    animation: blink 1.4s steps(2, start) infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes blink {
+    0%,
+    55% {
+        opacity: 1;
+    }
+    56%,
+    100% {
+        opacity: 0.2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bar,
+    .dot {
+        animation: none;
+    }
+}
