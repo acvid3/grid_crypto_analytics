@@ -1,4 +1,4 @@
-const BINANCE_API = 'https://api.binance.com/api/v3';
+const BINANCE_API = 'https://data-api.binance.vision/api/v3';
 
 export async function fetchHistoricalData(symbol, interval, startTime, endTime) {
     const chunkSize = 1000;

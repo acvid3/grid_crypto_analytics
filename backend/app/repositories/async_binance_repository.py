@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 class AsyncBinanceRepository:
     
     def __init__(self):
-        self.base_url = "https://api.binance.com/api/v3"
+        self.base_url = "https://data-api.binance.vision/api/v3"
         self.session = None
         self.semaphore = asyncio.Semaphore(10)
     
